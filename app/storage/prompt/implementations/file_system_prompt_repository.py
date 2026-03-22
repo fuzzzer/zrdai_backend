@@ -1,5 +1,6 @@
 import logging
 import aiofiles
+import os
 from app.config.settings import Settings
 from app.storage.prompt.prompt_repository import PromptRepository
 from app.domain.errors.api_errors import PromptNotFoundError
@@ -11,7 +12,9 @@ class FileSystemPromptRepository(PromptRepository):
         self._settings = settings
 
     async def get_prompt(self, *, name: str) -> str:
-        prompt_path = f"{self._settings.PROMPTS_PATH}/{name}.txt"
+        base_name = os.path.basename(name)
+        
+        prompt_path = os.path.join(self._settings.PROMPTS_PATH, f"{base_name}.txt")
         try:
             async with aiofiles.open(prompt_path, mode='r', encoding='utf-8') as f:
                 return await f.read()
